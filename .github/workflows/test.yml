@@ -24,13 +24,18 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: docker run -d --rm --name=dev-consul --network host consul
+    - run: env | sort
     - uses: ./
       with:
+        host: 0.0.0.0
+        port: '8500'
         key: foo
         value: bar
     - uses: ./
       id: test
       with:
+        host: 0.0.0.0
+        port: '8500'
         key: boo
     - name: Fail action
       if: ${{ steps.test.outputs.data != 'bar' }}

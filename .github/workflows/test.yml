@@ -10,46 +10,36 @@ on:
 jobs:
   unit:
     runs-on: ubuntu-latest
+    services:
+      consul:
+        image: consul:latest
+        ports:
+        - 8500:8500/tcp
     steps:
     - uses: actions/checkout@v2
     - run: yarn install
     - run: yarn run lint
-    - run: docker run -d --rm --name=dev-consul --network host consul
     - run: yarn test
-    - if: ${{ always() }}
-      run: docker stop dev-consul
 
   test:
     runs-on: ubuntu-latest
     services:
       consul:
         image: consul:latest
-        # env:
-        #   CONSUL_BIND_INTERFACE: eth0
         ports:
-        # - 8300-8302:8300-8302/tcp
-        # - 8301-8302:8301-8302/udp
         - 8500:8500/tcp
-        # - 8600:8600/tcp
-        # - 8600:8600/udp
     steps:
     - uses: actions/checkout@v2
-    # - run: docker run -d --rm --name=dev-consul --network host consul
-    - run: env | sort
-    - uses: ./
+    - name: Set value
+      uses: ./
       with:
-        # host: 0.0.0.0
-        # port: '8500'
         key: foo
         value: bar
-    - uses: ./
-      id: test
+    - name: Get value
+      uses: ./
+      id: consul
       with:
-        # host: 0.0.0.0
-        # port: '8500'
         key: foo
     - name: Fail action
-      if: ${{ steps.test.outputs.data != 'bar' }}
+      if: ${{ steps.consul.outputs.data != 'bar' }}
       run: exit 1
-    # - if: ${{ always() }}
-    #   run: docker stop dev-consul

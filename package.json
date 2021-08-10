@@ -24,7 +24,7 @@
   "homepage": "https://github.com/levonet/action-consul-kv#readme",
   "dependencies": {
     "@actions/core": "^1.4.0",
-    "consul": "^0.40.0"
+    "consul": "https://github.com/silas/node-consul.git#main"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.29.0",

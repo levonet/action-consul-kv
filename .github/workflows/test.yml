@@ -14,7 +14,10 @@ jobs:
     - uses: actions/checkout@v2
     - run: yarn install
     - run: yarn run lint
-    # - run: yarn test
+    - run: docker run -d --rm --name=dev-consul consul
+    - run: yarn test
+    - if: ${{ always() }}
+      run: docker stop dev-consul
 
   test:
     runs-on: ubuntu-latest
@@ -23,6 +26,14 @@ jobs:
     - run: docker run -d --rm --name=dev-consul consul
     - uses: ./
       with:
+        key: foo
+        value: bar
+    - uses: ./
+      id: test
+      with:
         key: boo
+    - name: Fail action
+      if: ${{ steps.test.outputs.data != 'bar' }}
+      run: exit 1
     - if: ${{ always() }}
       run: docker stop dev-consul

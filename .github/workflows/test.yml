@@ -21,24 +21,35 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    services:
+      consul:
+        image: consul:latest
+        env:
+          CONSUL_BIND_INTERFACE: eth0
+        ports:
+        - 8300-8302:8300-8302/tcp
+        - 8301-8302:8301-8302/udp
+        - 8500:8500/tcp
+        - 8600:8600/tcp
+        - 8600:8600/udp
     steps:
     - uses: actions/checkout@v2
-    - run: docker run -d --rm --name=dev-consul --network host consul
+    # - run: docker run -d --rm --name=dev-consul --network host consul
     - run: env | sort
     - uses: ./
       with:
-        host: 0.0.0.0
-        port: '8500'
+        # host: 0.0.0.0
+        # port: '8500'
         key: foo
         value: bar
     - uses: ./
       id: test
       with:
-        host: 0.0.0.0
-        port: '8500'
+        # host: 0.0.0.0
+        # port: '8500'
         key: boo
     - name: Fail action
       if: ${{ steps.test.outputs.data != 'bar' }}
       run: exit 1
-    - if: ${{ always() }}
-      run: docker stop dev-consul
+    # - if: ${{ always() }}
+    #   run: docker stop dev-consul
